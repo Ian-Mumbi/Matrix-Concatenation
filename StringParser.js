@@ -83,7 +83,7 @@ class StringParser {
 
 const parser = new StringParser();
 
-const sampleString = `if (var_1 === 2, 0, if (var_2 === 4, 15, 0)) + if (var_2 === 3, 5, 0) - if (var_4 === 2, 0, 5)`;
+const sampleString = `if (var_1 === 2, 0, if (var_2 === 4, 15, 0)) + if (var_2 === 3, 5, 0) - if (var_4 === 2, 0, 5) + if (var_3 === 3, 5, 0)`;
 const sampleObj = { var_1: 1, var_2: 4, var_3: 3, var_4: 5 };
 
 console.log(parser.main(sampleString, sampleObj));
