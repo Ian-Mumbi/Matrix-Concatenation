@@ -9,7 +9,8 @@ class StringParser {
 
   run = (strings, objectValues) => {
     const parsed = strings.map((string) => {
-      const parsed = this.getVal(string);
+      const parsed = this.getVal(string, objectValues);
+      console.log("PARSED ", parsed);
       return parsed;
     });
     return parsed.map((obj) => {
@@ -20,13 +21,34 @@ class StringParser {
     });
   };
 
-  getVal = (string) => {
+  getVal = (string, objectValues) => {
     const regExp = /\(([^)]+)\)/;
     const matches = regExp.exec(string);
+
+    let modValue = 0;
+
+    if (matches[1].includes("if")) {
+      const modString = matches[1] + ")";
+
+      const matches2 = regExp.exec(modString);
+
+      const variable = matches2[1].trim().split("===")[0].trim();
+      const values = matches2[1].trim().split("===")[1];
+
+      const [condition, truthy, falsy] = values
+        .split(",")
+        .map((val) => parseFloat(val));
+
+      modValue = objectValues[variable] === condition ? truthy : falsy;
+    }
     const variable = matches[1].trim().split("===")[0].trim();
     const values = matches[1].trim().split("===")[1];
 
-    return { [variable]: values.split(",").map((v) => parseFloat(v)) };
+    return {
+      [variable]: values.split(",").map((v) => {
+        return isNaN(parseFloat(v)) ? modValue : parseFloat(v);
+      }),
+    };
   };
 
   main = (string, objectValues) => {
@@ -61,7 +83,7 @@ class StringParser {
 
 const parser = new StringParser();
 
-const sampleString = `if (var_x === 3, 2, 0) + if (var_y === 4, 6, 8) - if (var_z === 3, 6, 8)`;
-const sampleObj = { var_x: 3, var_y: 3, var_z: 4 };
+const sampleString = `if (var_1 === 2, 0, if (var_2 === 4, 15, 0)) + if (var_2 === 3, 5, 0) - if (var_4 === 2, 0, 5)`;
+const sampleObj = { var_1: 1, var_2: 4, var_3: 3, var_4: 5 };
 
 console.log(parser.main(sampleString, sampleObj));
